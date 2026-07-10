@@ -17,7 +17,7 @@ public class MotorSubsystem implements Subsystem {
         motor.setPower(0.0);
     }); // automatically requires this
     public Command setMotor = instant(() -> {
-        motor.setPower(20.0);
+        motor.setPower(10.0);
     });
     public static Command runToPosition(ControlSystem system, double position, float velocity, KineticState tolerance) {
         return new LambdaCommand("RunToState(" + position + "," + velocity+ ")")
