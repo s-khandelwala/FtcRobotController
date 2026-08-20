@@ -7,7 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BoardMotorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
+import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.FollowPath;
@@ -21,7 +24,7 @@ public class PedroAuto extends NextFTCOpMode {
     public PedroAuto(){
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(BoardMotorSubsystem.INSTANCE),
+                new SubsystemComponent(BoardMotorSubsystem.INSTANCE, IntakeSubsystem.INSTANCE),
                 BulkReadComponent.INSTANCE
         );
     }
@@ -35,6 +38,10 @@ public class PedroAuto extends NextFTCOpMode {
     private PathChain upToLeft;
     @Override
     public void onInit(){
+        buildPaths();
+        PedroComponent.follower().setStartingPose(startPose);
+    }
+    public void buildPaths(){
         startToRight  = PedroComponent.follower().pathBuilder()
                 .addPath(new BezierLine(startPose,bottomRight))
                 .setLinearHeadingInterpolation(startPose.getHeading(),bottomRight.getHeading())
@@ -47,20 +54,24 @@ public class PedroAuto extends NextFTCOpMode {
                 .addPath(new BezierLine(topRight,topLeft))
                 .setLinearHeadingInterpolation(topRight.getHeading(),topLeft.getHeading())
                 .build();
-        PedroComponent.follower().setStartingPose(startPose);
     }
     @Override
     public void onStartButtonPressed(){
         new SequentialGroup(
-                new FollowPath(startToRight),
-                BoardMotorSubsystem.INSTANCE.spinAtRpm,
-                BoardMotorSubsystem.INSTANCE.stopMotor,
+                new ParallelGroup(
+                        new FollowPath(startToRight),
+                        IntakeSubsystem.INSTANCE.intakeOn()
+                ),
+                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
+                new Delay(0.5),
+                BoardMotorSubsystem.INSTANCE.stopMotor(),
                 new FollowPath(rightToUp),
-                BoardMotorSubsystem.INSTANCE.spinAtRpm,
-                BoardMotorSubsystem.INSTANCE.stopMotor,
+                IntakeSubsystem.INSTANCE.intakeOff(),
+                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
+                BoardMotorSubsystem.INSTANCE.stopMotor(),
                 new FollowPath(upToLeft),
-                BoardMotorSubsystem.INSTANCE.spinAtRpm,
-                BoardMotorSubsystem.INSTANCE.stopMotor
+                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
+                BoardMotorSubsystem.INSTANCE.stopMotor()
         ).schedule();
     }
 }
