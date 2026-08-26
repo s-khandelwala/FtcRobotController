@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BoardMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
@@ -36,6 +38,7 @@ public class PedroAuto extends NextFTCOpMode {
     private PathChain startToRight;
     private PathChain rightToUp;
     private PathChain upToLeft;
+    public static Pose lastPose;
     @Override
     public void onInit(){
         buildPaths();
@@ -58,20 +61,31 @@ public class PedroAuto extends NextFTCOpMode {
     @Override
     public void onStartButtonPressed(){
         new SequentialGroup(
-                new ParallelGroup(
-                        new FollowPath(startToRight),
-                        IntakeSubsystem.INSTANCE.intakeOn()
-                ),
-                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
-                new Delay(0.5),
-                BoardMotorSubsystem.INSTANCE.stopMotor(),
+                driveWithIntake(startToRight),
+                spinThenStop(),
                 new FollowPath(rightToUp),
                 IntakeSubsystem.INSTANCE.intakeOff(),
-                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
-                BoardMotorSubsystem.INSTANCE.stopMotor(),
+                spinThenStop(),
                 new FollowPath(upToLeft),
-                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
-                BoardMotorSubsystem.INSTANCE.stopMotor()
+                spinThenStop()
         ).schedule();
+    }
+    @Override
+    public void onStop() {
+        lastPose = PedroComponent.follower().getPose();
+        CommandManager.INSTANCE.cancelAll();
+    }
+    public Command driveWithIntake(PathChain path){
+        return new ParallelGroup(
+                new FollowPath(path),
+                IntakeSubsystem.INSTANCE.intakeOn()
+        );
+    }
+    public Command spinThenStop(){
+        return new SequentialGroup(
+                BoardMotorSubsystem.INSTANCE.spinAtRpm(),
+                new Delay(0.5),
+                BoardMotorSubsystem.INSTANCE.stopMotor()
+        );
     }
 }

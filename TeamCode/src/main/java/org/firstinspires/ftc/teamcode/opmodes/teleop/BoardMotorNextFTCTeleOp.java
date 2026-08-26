@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.BoardMotorSubsystem;
@@ -10,6 +11,7 @@ import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+@Disabled
 @TeleOp(name = "Practice Board Motor TeleOp", group = "Practice")
 public class BoardMotorNextFTCTeleOp extends NextFTCOpMode {
     public BoardMotorNextFTCTeleOp(){
