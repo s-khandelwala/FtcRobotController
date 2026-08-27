@@ -7,8 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.opmodes.auto.PedroAuto;
+import org.firstinspires.ftc.teamcode.subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.BoardMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.groups.ParallelGroup;
@@ -27,7 +29,7 @@ public class PracticeFullTeleOp extends NextFTCOpMode {
     public PracticeFullTeleOp() {
         addComponents(
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(BoardMotorSubsystem.INSTANCE, IntakeSubsystem.INSTANCE),
+                new SubsystemComponent(BoardMotorSubsystem.INSTANCE, IntakeSubsystem.INSTANCE, ArmSubsystem.INSTANCE,ShooterSubsystem.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );
@@ -57,6 +59,10 @@ public class PracticeFullTeleOp extends NextFTCOpMode {
         Gamepads.gamepad2().a().whenBecomesTrue(BoardMotorSubsystem.INSTANCE.spinMotor());
         Gamepads.gamepad2().b().whenBecomesTrue(BoardMotorSubsystem.INSTANCE.stopMotor());
         Gamepads.gamepad2().x().whenBecomesTrue(BoardMotorSubsystem.INSTANCE.reverseMotor());
+        Gamepads.gamepad2().dpadRight().whenBecomesTrue(ArmSubsystem.INSTANCE.armUp());
+        Gamepads.gamepad2().dpadLeft().whenBecomesTrue(ArmSubsystem.INSTANCE.armDown());
+        Gamepads.gamepad2().rightStickButton().whenBecomesTrue(ShooterSubsystem.INSTANCE.shooterOn());
+        Gamepads.gamepad2().leftStickButton().whenBecomesTrue(ShooterSubsystem.INSTANCE.shooterOff());
         Gamepads.gamepad2().y().whenBecomesTrue(
                 new ParallelGroup(
                         IntakeSubsystem.INSTANCE.intakeOn(),
